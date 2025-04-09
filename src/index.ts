@@ -25,6 +25,3 @@ if(options?.sender && options?.reciever) {
 }
 
 handleNode(options)
-
-
-console.log(options);
