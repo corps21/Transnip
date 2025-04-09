@@ -2,7 +2,7 @@
   "name": "transnip",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./output/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,6 +20,7 @@
     "@chainsafe/libp2p-yamux": "^7.0.1",
     "@libp2p/mdns": "^11.0.32",
     "@libp2p/tcp": "^10.1.8",
+    "clipboard-event": "^1.6.0",
     "commander": "^13.1.0",
     "figlet": "^1.8.0",
     "libp2p": "^2.8.2"
