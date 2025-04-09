@@ -4,9 +4,9 @@ import { handleNode } from "./handleNode.js";
 console.log(figlet.textSync("Transnip"));
 
 program
-  .option("-p, --port <number>", "port number to listen (default: 10333)")
+  .option("-p, --port <number>", "port number to listen (default: 0)")
   .option(
-    "-l, --listen-address [address...]",
+    "-l, --listen-address <address>",
     "list of listen addresses (default: 0.0.0.0)"
   )
   .option("-s, --sender", "sender (default: true)")
@@ -23,5 +23,5 @@ const options = program.opts();
 if(options?.sender && options?.reciever) {
     program.error("Node can't be sender and receiver at the same time")
 }
-
+console.log(options)
 handleNode(options)

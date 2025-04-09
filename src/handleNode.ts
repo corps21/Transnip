@@ -2,8 +2,11 @@ import { createNode } from "./createNode.js";
 import { OptionValues } from "commander";
 
 function handleNode(options: OptionValues) {
+  
+  const node = createNode(options?.port, options?.listenAddress)
+
   if (options?.reciever) {
-    createNode().then((reciever) => {
+    node.then((reciever) => {
       reciever.addEventListener("peer:connect", (evt) => {
         const remotePeer = evt.detail;
         console.log("connected to: ", remotePeer.toString());
@@ -22,14 +25,14 @@ function handleNode(options: OptionValues) {
       });
     });
   } else {
-    createNode().then((sender) => {
+    node.then((sender) => {
       console.log("Dialer ready, listening on:");
       sender.getMultiaddrs().forEach((ma) => {
         console.log(ma.toString());
       });
-      sender.addEventListener('peer:discovery',(evt) => {
+      sender.addEventListener('peer:discovery', (evt) => {
         sender.dialProtocol(evt.detail.multiaddrs, '/test/0.0.1').then(() => {
-            console.log("sending something")
+          console.log("sending something")
         })
       })
     });

@@ -6,7 +6,7 @@ import { mdns } from '@libp2p/mdns'
 import { Libp2pOptions } from 'libp2p'
 
 
-async function createNode(portNumber:number=0,ipv4Address:string="0.0.0.0",config?:Libp2pOptions) {
+async function createNode(portNumber:number | string=0,ipv4Address:string="0.0.0.0",config?:Libp2pOptions) {
     const defaults: Libp2pOptions = {
         addresses: {
             listen: [`/ip4/${ipv4Address}/tcp/${portNumber}`]
