@@ -1,25 +1,25 @@
 import { spawn } from "node:child_process";
 import { readableToString } from "./readableToString.js";
-import clipboardListener, { ClipboardEventListener } from "clipboard-event";
-import {Stream} from "@libp2p/interface"
+import clipboardListener from "clipboard-event";
+import { Libp2p, ServiceMap, PeerId } from "@libp2p/interface";
+import { Multiaddr } from "@multiformats/multiaddr";
+import { writeStream } from "./stream.js";
 
 function startListeningAndGetClipboard(
   getClipboard: () => Promise<string>,
-  dialProtocol: Promise<Stream>,
-  dialProtocolCallback: (...args:unknown[]) => void
+  sender: Libp2p<ServiceMap>,
+  peer: PeerId | Multiaddr | Multiaddr[],
+  protocols: string | string[]
 ) {
-  return function () {
-    clipboardListener.startListening();
-    clipboardListener.on("change", async () => {
-      // const result = await getClipboard();
-      // console.log("this is result ", result)
-      // dialProtocol.then((...args) => {
-      //   dialProtocolCallback(result,...args);
-      // });
-      console.log("Got called")
-    });
-    clipboardListener.stopListening();
-  };
+  clipboardListener.startListening();
+  clipboardListener.on("change", async () => {
+    console.time("clip")
+    const clipboardText = await getClipboard();
+    console.log(clipboardText)
+    const stream = await sender.dialProtocol(peer, protocols);
+    writeStream(stream, clipboardText);
+    console.timeEnd("clip")
+  });
 }
 
 async function getWindowsClipboard() {
@@ -31,4 +31,8 @@ function setWindowsClipboard(value: string) {
   spawn("clip").stdin.end(value);
 }
 
-export { getWindowsClipboard, setWindowsClipboard,startListeningAndGetClipboard };
+export {
+  getWindowsClipboard,
+  setWindowsClipboard,
+  startListeningAndGetClipboard,
+};

@@ -1,9 +1,14 @@
 import { createNode } from "./createNode.js";
 import { OptionValues } from "commander";
-import { startListeningAndGetClipboard,getWindowsClipboard} from "../utils/clipboard.js";
+import { readStream } from "../utils/stream.js";
+import {
+  startListeningAndGetClipboard,
+  getWindowsClipboard,
+  setWindowsClipboard
+} from "../utils/clipboard.js";
+
 function handleNode(options: OptionValues) {
-  
-  const node = createNode(options?.port, options?.listenAddress)
+  const node = createNode(options?.port, options?.listenAddress);
 
   if (options?.reciever) {
     node.then((reciever) => {
@@ -11,15 +16,14 @@ function handleNode(options: OptionValues) {
         const remotePeer = evt.detail;
         console.log("connected to: ", remotePeer.toString());
       });
-      reciever
-        .handle("/test/0.0.1", () => {
-          console.log("recieving");
-        })
-        .then(() => {
-          console.log("done with receiving");
-        });
-      console.log("Listener ready, listening on:");
 
+      reciever.handle("/test/0.0.1", async (data) => {
+        console.log("recieving");
+        const recievedText = await readStream(data.stream)
+        setWindowsClipboard(recievedText)
+      });
+
+      console.log("Listener ready, listening on:");
       reciever.getMultiaddrs().forEach((ma) => {
         console.log(ma.toString());
       });
@@ -30,20 +34,15 @@ function handleNode(options: OptionValues) {
       sender.getMultiaddrs().forEach((ma) => {
         console.log(ma.toString());
       });
-      sender.addEventListener('peer:discovery', (evt) => {
-        
-        console.log("Discovered some peers")
-
-        const dialProtocol = sender.dialProtocol(evt.detail.multiaddrs, '/test/0.0.1')
-        const dialProtocolCallback = (...args:unknown[]) => {
-          console.log("Got something")
-          console.log(args)
-        }
-        console.time("Start")
-        const callback = startListeningAndGetClipboard(getWindowsClipboard,dialProtocol,dialProtocolCallback)
-        callback()
-        console.timeEnd("Start")
-      })
+      sender.addEventListener("peer:discovery", (evt) => {
+        console.log("Discovered some peers");
+        startListeningAndGetClipboard(
+          getWindowsClipboard,
+          sender,
+          evt.detail.multiaddrs,
+          "/test/0.0.1"
+        );
+      });
     });
   }
 }
