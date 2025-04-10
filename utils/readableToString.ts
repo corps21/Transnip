@@ -5,5 +5,5 @@ export async function readableToString(readable:Readable) {
     for await (const chunk of readable) {
       chunks.push(chunk);
     }
-    return chunks;
+    return chunks.toString();
 }

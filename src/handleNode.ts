@@ -1,6 +1,6 @@
 import { createNode } from "./createNode.js";
 import { OptionValues } from "commander";
-
+import { startListeningAndGetClipboard,getWindowsClipboard} from "../utils/clipboard.js";
 function handleNode(options: OptionValues) {
   
   const node = createNode(options?.port, options?.listenAddress)
@@ -31,9 +31,18 @@ function handleNode(options: OptionValues) {
         console.log(ma.toString());
       });
       sender.addEventListener('peer:discovery', (evt) => {
-        sender.dialProtocol(evt.detail.multiaddrs, '/test/0.0.1').then(() => {
-          console.log("sending something")
-        })
+        
+        console.log("Discovered some peers")
+
+        const dialProtocol = sender.dialProtocol(evt.detail.multiaddrs, '/test/0.0.1')
+        const dialProtocolCallback = (...args:unknown[]) => {
+          console.log("Got something")
+          console.log(args)
+        }
+        console.time("Start")
+        const callback = startListeningAndGetClipboard(getWindowsClipboard,dialProtocol,dialProtocolCallback)
+        callback()
+        console.timeEnd("Start")
       })
     });
   }
