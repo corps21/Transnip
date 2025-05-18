@@ -6,7 +6,7 @@ function writeStream(stream:Stream,text:string) {
 }
 
 async function readStream(stream:Stream) {
-    return (await stream.source.next()).value.bufs.toString()
+    return (await stream.source.next()).value?.bufs.toString()
 }
 
 export {writeStream, readStream}
